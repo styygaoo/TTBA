@@ -1,8 +1,8 @@
 # Introduction
 
-This is a project which has provided a simple example to implement an test-time batch adaptation (TTBA) Algorithm [1] on a depth estimation model [2].
+This is a project that has provided a simple example to implement a test-time batch adaptation (TTBA) Algorithm [1] on a depth estimation model [2].
 
-The code of TENT[3] hepled a lot as well. 
+The code of TENT [3] helped a lot as well. 
 
 
 
