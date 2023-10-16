@@ -17,9 +17,6 @@ class Ordinal_entropy(nn.Module):
         self.steps = steps
         assert steps > 0, "tent requires >= 1 step(s) to forward and update"  # if not steps >=0, then trigger error
         self.episodic = episodic
-
-
-
         # note: if the model is never reset, like for continual adaptation,
         # then skipping the state copy would save memory
 
@@ -42,23 +39,17 @@ class Ordinal_entropy(nn.Module):
                                  self.model_state, self.optimizer_state)
 
 
-# @torch.jit.script
-# def softmax_entropy(x: torch.Tensor) -> torch.Tensor:
-#     """Entropy of softmax distribution from logits."""
-#     return -(x.softmax(1) * x.log_softmax(1)).sum(1)
-
 @torch.enable_grad()  # ensure grads in possible no grad context for testing
 def forward_and_adapt(x, model, optimizer):
     """Forward and adapt model on batch of data.
-
-    Measure entropy of the model prediction, take gradients, and update params.
+    Measure ordinal entropy of the model prediction, take gradients, and update params.
     """
     # forward
+    optimizer.zero_grad()
     outputs, features = model(x)
-    outputs = outputs.detach()                  # detach the target before computing the loss  https://stackoverflow.com/questions/72590591/the-derivative-for-target-is-not-implemented
-    # features = features.detach()
+    # outputs as pseudo-label
+    outputs = outputs.detach()    # detach the target before computing the loss  https://stackoverflow.com/questions/72590591/the-derivative-for-target-is-not-implemented
     # adapt
-    # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated() / 1024 ** 2))
     loss = ordinalentropy_loss(features, outputs)
     # loss = torch.nn.L1Loss()
     # loss = loss(features, outputs)
@@ -70,24 +61,7 @@ def forward_and_adapt(x, model, optimizer):
     loss.backward()
     optimizer.step()
     # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated() / 1024 ** 2))
-    optimizer.zero_grad()
     return outputs
-
-#
-# @torch.enable_grad()  # ensure grads in possible no grad context for testing
-# def forward_and_adapt(x, model, optimizer):
-#     """Forward and adapt model on batch of data.
-#
-#     Measure entropy of the model prediction, take gradients, and update params.
-#     """
-#     # forward
-#     outputs = model(x)
-#     # adapt
-#     loss = softmax_entropy(outputs).mean(0)
-#     loss.backward()
-#     optimizer.step()
-#     optimizer.zero_grad()
-#     return outputs
 
 def copy_model_and_optimizer(model, optimizer):
     """Copy the model and optimizer states for resetting after adaptation."""

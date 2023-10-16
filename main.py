@@ -1,6 +1,5 @@
 import torch
 from torch.utils.data import DataLoader
-
 import ordinal_entropy
 from data.get_vKITTI import VKITTI
 from model.model_loader import load_model
@@ -14,10 +13,9 @@ from metrics import AverageMeter, Result
 
 
 
-
+# Initialization
 transformation = T.ToTensor()
 trans = T.Compose([T.ToTensor()])
-
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 maxDepth = 80
 My_to_tensor = ToTensor(test=True, maxDepth=maxDepth)
@@ -37,37 +35,22 @@ testset = VKITTI('./vkitti_testset_test/test', (192, 640))
 testset_loader = DataLoader(testset, batch_size=4, shuffle=False, num_workers=2, pin_memory=True, drop_last=True)       # , drop_last=True
 
 
-# Define loss function and optimizer for fine-tuning
+# Define optimizer for fine-tuning
 # optimizer = optim.Adam(params, lr=0.0001, betas=(0.9, 0.999), weight_decay=0.0)
-
 optimizer = optim.SGD(params, lr=0.001, weight_decay=0.0)
+# loss = nn.MSE()
+
 # oering the given model to make it adaptive for test data
 adapted_model = ordinal_entropy.Ordinal_entropy(model, optimizer)
 adapted_model.cuda()
-
 # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated()/1024**2))
 
 average_meter = AverageMeter()
+
+# preparation of data to feed GDM
 for i, data in enumerate(testset_loader):
     t0 = time.time()
     images, gts = data
-    # images = images.detach()
-    # gts = gts.detach()
-    # print(image)
-    # print(images.shape)
-    # print(gts.shape)
-    # print(images.shape[0])
-    # print(image[0].shape)
-    # print(gt[0].shape)
-    # batched_image = torch.zeros_like(image[0])
-    # batched_gt = torch.zeros_like(gt[0])
-    # print(batched_image.shape)
-    # print(batched_gt.shape)
-    # batched_image = batched_image.permute(2, 0, 1)
-    # print(batched_image.shape)
-    # batched_image = batched_image.unsqueeze(0)
-    # print(batched_image.shape)
-
     for b in range(images.shape[0]):
         # print(b)
         packed_data = {'image': images[b], 'depth': gts[b]}
@@ -76,7 +59,6 @@ for i, data in enumerate(testset_loader):
         # image, gt = data['image'], data['depth']
         image = image.unsqueeze(0)
         gt = gt.unsqueeze(0)
-
         if b >= 1:
             batched_images = torch.cat((batched_images, batched_image))
             batched_gts = torch.cat((batched_gts, batched_gt))
@@ -86,15 +68,18 @@ for i, data in enumerate(testset_loader):
         batched_image = image
         batched_gt = gt
 
+        # free gpu memory
         batched_image.detach().cpu()
         batched_gt.detach().cpu()
         image = image.detach().cpu()
         gt = gt.detach().cpu()
-    # print(batched_images.shape)
+
     data_time = time.time() - t0
     t0 = time.time()
-    # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated() / 1024 ** 2))
     torch.cuda.empty_cache()  # Releases all unoccupied cached memory currently held by the caching allocator
+
+
+    ############################################################
     inv_prediction = adapted_model(batched_images).detach().cpu()
     predictions = inverse_depth_norm(inv_prediction)
 
