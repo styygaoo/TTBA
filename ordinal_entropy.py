@@ -50,9 +50,9 @@ def forward_and_adapt(x, model, optimizer):
     # outputs as pseudo-label
     outputs = outputs.detach()    # detach the target before computing the loss  https://stackoverflow.com/questions/72590591/the-derivative-for-target-is-not-implemented
     # adapt
-    loss = ordinalentropy_loss(features, outputs)
-    # loss = torch.nn.L1Loss()
-    # loss = loss(features, outputs)
+    # loss = ordinalentropy_loss(features, outputs)
+    loss = torch.nn.L1Loss()
+    loss = loss(features, outputs)
 
     # loss_func = Depth_Loss(1, 1, 1, maxDepth=80)
     # loss = loss_func(features, outputs)

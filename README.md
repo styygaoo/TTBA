@@ -1,10 +1,31 @@
 # Introduction
 
-This is a project that has provided a simple example to implement a test-time batch adaptation (TTBA) Algorithm [1] on a depth estimation model [2].
+This is a project that has provided an example to implement a test-time batch adaptation (TTBA) Algorithm [1] on a depth estimation model [2].
 
 The code of TENT [3] helped a lot as well. 
 
 
+## **Environment setup**
+The project depends on :
+- [pytorch](https://pytorch.org/) (Main framework)
+
+
+Install environment using `environment.yml` : 
+
+
+Using conda : 
+
+```bash
+conda env create -n TTBA --file environment.yml
+conda activate TTBA
+```
+
+
+## **Usage**
+Please clone this repo entirely.
+
+the main.py is the file to run the TTBA on the model Guided decoding model(GDM) from the source domain KITTI to the target domain VKITTI.
+To check the performance of the original model, you can run test_original_model.py
 
 
 ## Reference

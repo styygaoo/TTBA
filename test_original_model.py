@@ -21,11 +21,11 @@ My_to_tensor = ToTensor(test=True, maxDepth=maxDepth)
 
 # Load pre-trained model
 model_original = load_model('GuideDepth', './model/weights/KITTI_Half_GuideDepth.pth')
-# model_original.eval().cuda()
+model_original.eval().cuda()
 
 # Load model parameter to be fine-tuned during test phase
-model = configure_model(model_original)
-params, param_names = collect_params(model)
+# model = configure_model(model_original)
+# params, param_names = collect_params(model)
 
 
 # Prepare test dataloader for TTA
@@ -35,11 +35,11 @@ testset_loader = DataLoader(testset, batch_size=2, shuffle=False, num_workers=2,
 
 
 # Define loss function and optimizer for fine-tuning
-optimizer = optim.Adam(params, lr=0.0001, betas=(0.9, 0.999), weight_decay=0.0)
+# optimizer = optim.Adam(params, lr=0.0001, betas=(0.9, 0.999), weight_decay=0.0)
 # optimizer = optim.SGD(params, lr=0.001, weight_decay=0.0)
 # oering the given model to make it adaptive for test data
-adapted_model = ordinal_entropy.Ordinal_entropy(model, optimizer)
-adapted_model.cuda()
+# adapted_model = ordinal_entropy.Ordinal_entropy(model, optimizer)
+# adapted_model.cuda()
 
 # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated()/1024**2))
 
@@ -74,7 +74,7 @@ for i, data in enumerate(testset_loader):
     t0 = time.time()
     # print("{:.3f}MB allocated".format(torch.cuda.memory_allocated() / 1024 ** 2))
     torch.cuda.empty_cache()  # Releases all unoccupied cached memory currently held by the caching allocator
-    inv_prediction = adapted_model(batched_images)
+    inv_prediction, _ = model_original(batched_images)
     # inv_prediction = model_original(batched_images).detach().cpu()
     predictions = inverse_depth_norm(inv_prediction)
 
@@ -102,11 +102,3 @@ print('\n*\n'
       'Lg10={average.lg10:.3f}\n'
       't_GPU={time:.3f}\n'.format(
     average=avg, time=avg.gpu_time))
-
-
-
-
-
-
-
-
