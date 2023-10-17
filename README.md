@@ -22,9 +22,9 @@ conda activate TTBA
 
 
 ## **Usage**
-Please clone this repo entirely.
 
 the main.py is the file to run the TTBA on the model Guided decoding model(GDM) from the source domain KITTI to the target domain VKITTI.
+
 To check the performance of the original model, you can run test_original_model.py
 
 
