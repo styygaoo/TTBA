@@ -6,12 +6,8 @@ The code of TENT [3] helped a lot as well.
 
 
 ## **Environment setup**
-The project depends on :
-- [pytorch](https://pytorch.org/) (Main framework)
-
 
 Install environment using `environment.yml` : 
-
 
 Using conda : 
 
@@ -19,6 +15,11 @@ Using conda :
 conda env create -n TTBA --file environment.yml
 conda activate TTBA
 ```
+
+Suppose you can not install the environment TTBA via the above command. In that case, you can install the required libraries one by one manually since there are only few additional libraries needed to run this program.
+The project depends on :
+- [pytorch](https://pytorch.org/) (Main framework)
+- PIL
 
 
 ## **Usage**
