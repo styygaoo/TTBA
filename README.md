@@ -17,6 +17,7 @@ conda activate TTBA
 ```
 
 Suppose you can not install the environment TTBA via the above command. In that case, you can install the required libraries one by one manually since there are only few additional libraries needed to run this program.
+
 The project depends on :
 - [pytorch](https://pytorch.org/) (Main framework)
 - PIL
