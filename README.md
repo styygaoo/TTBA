@@ -29,6 +29,14 @@ the main.py is the file to run the TTBA on the model Guided decoding model(GDM) 
 
 To check the performance of the original model, you can run test_original_model.py
 
+For Windows users, this line 
+
+testset_loader = DataLoader(testset, batch_size=2, shuffle=False, num_workers=2, pin_memory=True, drop_last=True)       # drop_last=True
+
+must be modified to
+
+testset_loader = DataLoader(testset, batch_size=2, shuffle=False, num_workers=0, pin_memory=True, drop_last=True)       # drop_last=True
+
 
 ## Reference
 
